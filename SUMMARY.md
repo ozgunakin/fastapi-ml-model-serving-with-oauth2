@@ -1,3 +1,3 @@
 # Table of contents
 
-* [FastAPI-ML-Model-Serving-with-Oauth2](README.md)
+* [Serving ML Models Using FastAPI  (Oauth2 and Logging Mechanism are Included)](README.md)
