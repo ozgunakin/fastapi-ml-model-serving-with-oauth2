@@ -14,16 +14,14 @@ We need to create user database to be able to authorize the user when the user r
 
 * [x] Create username and password for the user
 
-| username     |              |
-| ------------ | ------------ |
-| **username** | **password** |
-| trialuser    | trialpass123 |
+| username  | password     |
+| --------- | ------------ |
+| trialuser | trialpass123 |
 
 * [x] Hash the password using online Bcrypt generator tool. ([https://bcrypt-generator.com](https://bcrypt-generator.com))
 
-|              |                                                              |
-| ------------ | ------------------------------------------------------------ |
 | password     | hashed-password                                              |
+| ------------ | ------------------------------------------------------------ |
 | trialpass123 | $2a$12$O/9CiF4Ul3WdEgDPCaYtt.r/QjA5kZORpZENxNkV4E8HuD/fZEnma |
 
 
@@ -33,7 +31,7 @@ We need to create user database to be able to authorize the user when the user r
 ```
 import sqlite3
 
-conn = sqlite3.connect('usersdbhttps://app.gitbook.com/s/E6KRowObfenbAEHS77cO/c/F2BtuRo24BkC7iepoT5m/~/change-requests/open') 
+conn = sqlite3.connect('usersdb') 
 c = conn.cursor()
 
 c.execute('''
