@@ -53,4 +53,9 @@ conn.commit()
 print("finished")
 ```
 
-TRIAL
+## Step 2 - Developing Machine Learning Model
+
+We will train a machine learning model using pima-indians-diabetes data (you can find the details here [https://www.kaggle.com/uciml/pima-indians-diabetes-database](https://www.kaggle.com/uciml/pima-indians-diabetes-database)). If you already have an ML model you can skip this step.
+
+
+
