@@ -8,7 +8,7 @@ This project includes serving a machine learning model using FastAPI with Outh2 
 
 ![Communication steps between client and FastAPI server](.gitbook/assets/image.png)
 
-## &#x20;Step 1 - Creating Sqlite User Database in Python&#x20;
+## Step 1 - Creating Sqlite User Database in Python&#x20;
 
 We need to create user database to be able to authorize the user when the user request for access token. In this database we will store user-name and user-hashed-password (we will use Bcyrpt encrypted hash of the password)
 
@@ -57,5 +57,34 @@ print("finished")
 
 We will train a machine learning model using pima-indians-diabetes data (you can find the details here [https://www.kaggle.com/uciml/pima-indians-diabetes-database](https://www.kaggle.com/uciml/pima-indians-diabetes-database)). If you already have an ML model you can skip this step.
 
+* [x] Open your jupyter notebook.
 
+```
+jupyter notebook
+```
+
+* [x] Create and dump dummy ML model ([https://machinelearningmastery.com/save-load-machine-learning-models-python-scikit-learn/](https://machinelearningmastery.com/save-load-machine-learning-models-python-scikit-learn/))
+
+```
+# Save Model Using Pickle
+import pandas
+from sklearn import model_selection
+from sklearn.linear_model import LogisticRegression
+import pickle
+url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+dataframe = pandas.read_csv(url, names=names)
+array = dataframe.values
+X = array[:,0:8]
+Y = array[:,8]
+test_size = 0.33
+seed = 7
+X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X, Y, test_size=test_size, random_state=seed)
+# Fit the model on training set
+model = LogisticRegression()
+model.fit(X_train, Y_train)
+# save the model to disk
+filename = 'finalized_model.sav'
+pickle.dump(model, open(filename, 'wb'))
+```
 
