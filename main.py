@@ -67,7 +67,7 @@ class UserInDB(User):
 
 #USER DEFINED FUNCTIONS
 def import_users_db():
-    conn = sqlite3.connect('usersdb') 
+    conn = sqlite3.connect('usersdbtrial') 
     c = conn.cursor()
     c.execute('''
           SELECT *
