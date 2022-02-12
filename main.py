@@ -190,7 +190,7 @@ async def predict(request: Request,current_user: User = Depends(get_current_acti
 '''
 
 @app.post("/regression")
-def postanitem(inp: int):
+def postanitem(inp: list):
     inp = np.array(inp).reshape(1,-1)
     filename = 'finalized_model.sav'
     loaded_model = pickle.load(open(filename, 'rb'))
