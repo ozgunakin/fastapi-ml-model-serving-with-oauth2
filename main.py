@@ -12,7 +12,6 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 import pickle
 
-
 #Libraries for userdb connection
 import sqlite3
 import pandas as pd
@@ -36,13 +35,6 @@ ALGORITHM = "HS256"
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-'''
-#Ml-model
-model_name = "logistic"
-model = BertForSequenceClassification.from_pretrained("iyi bert/outputs/checkpoint-4732-epoch-2")
-tokenizer = AutoTokenizer.from_pretrained("iyi bert/outputs/checkpoint-4732-epoch-2")
-classifier = pipeline("text-classification",model,tokenizer=tokenizer)
-'''
 
 #Apı limitter description
 limiter = Limiter(key_func=get_remote_address)
@@ -169,25 +161,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @app.get("/v1/test",tags=["connection-test"])
 async def test_api(current_user: User = Depends(get_current_active_user)):
     return {"Hello": "World"}
-
-'''
-@app.post("/v1/sentiment_v1",tags=["ml-models"])
-#@limiter.limit("2/minute")
-async def predict(request: Request,current_user: User = Depends(get_current_active_user),status_code=status.HTTP_200_OK):
-
-    request_data = await request.json()
-    response_data = request_data.copy()
-    customer=[d['Text'] for d in request_data['Channels'][0]['SpeechRegions']]
-    agent=[d['Text'] for d in request_data['Channels'][1]['SpeechRegions']]
-    response_data['Channels'][0]['Sentiments']=classifier(customer)
-    response_data['Channels'][1]['Sentiments']=classifier(agent)
-
-    #logging
-    request_header=request.headers
-    log_api_calls(request_data,response_data,request_header)
-
-    return response_data
-'''
 
 @app.post("/regression")
 def postanitem(inp: list):
