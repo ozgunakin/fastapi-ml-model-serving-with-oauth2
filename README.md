@@ -53,7 +53,7 @@ conn.commit()
 print("finished")
 ```
 
-## Step 2 - Developing Machine Learning Model
+## Step 2 - Developing the Machine Learning Model
 
 We will train a machine learning model using pima-indians-diabetes data (you can find the details here [https://www.kaggle.com/uciml/pima-indians-diabetes-database](https://www.kaggle.com/uciml/pima-indians-diabetes-database)). If you already have an ML model you can skip this step.
 
@@ -87,4 +87,179 @@ model.fit(X_train, Y_train)
 filename = 'finalized_model.sav'
 pickle.dump(model, open(filename, 'wb'))
 ```
+
+## Step 3 - Developing the API
+
+In this section, API development with security features will be described step by step. You can check fastapi website for detailed information. [https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/)
+
+{% hint style="info" %}
+You can find full version of the code in the files (main.py).
+{% endhint %}
+
+* [x] Install python-jose library to generate and verify JWT tokens
+
+```
+pip install "python-jose[cryptography]"
+```
+
+* [x] Install passlib library to handle password hashes
+
+```
+pip install "passlib[bcrypt]"
+```
+
+* [x] Create a random secret key that will be used to sign the JWT tokens
+
+```
+openssl rand -hex 32
+
+09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+```
+
+* [x] Add Secret Key to your python code and describe oauth scheme and cryptographic context.
+
+```
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
+
+#PARAMETERS and DESCRIPTIONS
+
+# to get a string like this run:
+# openssl rand -hex 32
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
+
+#Oauth2 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+```
+
+* [x] Add security management functions
+
+```
+def import_users_db():
+    conn = sqlite3.connect('usersdbtrial') 
+    c = conn.cursor()
+    c.execute('''
+          SELECT *
+          FROM users
+          ''')
+
+    df = pd.DataFrame(c.fetchall(),columns=["username","full_name",
+          "email","hashed_password",
+          "disabled"])
+    print (df)
+    df.set_index(df["username"],inplace=True)
+    result = df.to_json(orient="index")
+    users_db = json.loads(result)
+
+    return users_db
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def get_user(db, username: str):
+    if username in db:
+        user_dict = db[username]
+        return UserInDB(**user_dict)
+
+def authenticate_user(fake_db, username: str, password: str):
+    user = get_user(fake_db, username)
+    if not user:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+    user = get_user(users_db, username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+```
+
+* [x] Add logging mechanism
+
+```
+def log_api_calls(request_data,response_data,request_header):
+    now = datetime.now()
+    log_data={"date":str(now),"request":str(request_data),"response":str(response_data),"request_header":str(request_header)},
+    df_log=pd.DataFrame(log_data)
+    df_log.to_csv("log.csv", mode="a", header=False, index=False)
+
+    message="logging succesfull"
+    print(message)
+```
+
+* [x] Call FastAPI library and create an endpoint to be used to create the session token
+
+```
+app = FastAPI()
+
+#Add api limitter to app
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+#Userdb connection
+users_db = import_users_db() 
+
+@app.post("/token", response_model=Token, tags=["create-token"])
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = authenticate_user(users_db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = create_access_token(
+        data={"sub": user.username}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+```
+
+* [x] Add the regression endpoint for inetacting your machine learning model
+
+```
+@app.post("/regression")
+def postanitem(inp: list):
+    inp = np.array(inp).reshape(1,-1)
+    filename = 'finalized_model.sav'
+    loaded_model = pickle.load(open(filename, 'rb'))
+    out = loaded_model.predict(inp)
+    print(float(out))
+    o = {'Output':float(out)}
+    return o
+```
+
+## Step 4 - Testing the API
 
