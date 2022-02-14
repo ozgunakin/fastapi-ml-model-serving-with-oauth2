@@ -263,3 +263,19 @@ def postanitem(inp: list):
 
 ## Step 4 - Testing the API
 
+You can reach at the swagger UI over [http://127.0.0.1:8000/docs#](http://127.0.0.1:8000/docs#)
+
+![](<.gitbook/assets/image (4).png>)
+
+* [x] Click create-token section. Then click the try it out button placed at the right corner. Enter the username as "trialuser" and the password as "trialpass123" then click the execute button. You will get access\_token for your session.
+
+![](<.gitbook/assets/image (3).png>)
+
+* [x] Copy the access\_token and paste it into the Token box in the Authorization tab in Postman.
+
+![](<.gitbook/assets/image (2).png>)
+
+* [ ] Put your test data into Body section in a list as raw. Test your API by sending POST request with Postman
+
+![](<.gitbook/assets/image (1).png>)
+
