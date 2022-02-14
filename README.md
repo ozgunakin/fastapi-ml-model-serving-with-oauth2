@@ -263,6 +263,12 @@ def postanitem(inp: list):
 
 ## Step 4 - Testing the API
 
+* [x] Run the API
+
+```
+uvicorn main:app --reload
+```
+
 You can reach at the swagger UI over [http://127.0.0.1:8000/docs#](http://127.0.0.1:8000/docs#)
 
 ![](<.gitbook/assets/image (4).png>)
