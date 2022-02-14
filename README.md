@@ -275,7 +275,7 @@ You can reach at the swagger UI over [http://127.0.0.1:8000/docs#](http://127.0.
 
 ![](<.gitbook/assets/image (2).png>)
 
-* [ ] Put your test data into Body section in a list as raw. Test your API by sending POST request with Postman
+* [ ] Put your test data (\[3,102,44,20,94,30.8,0.4,26]) into Body section in a list as raw. Test your API by sending POST request with Postman
 
 ![](<.gitbook/assets/image (1).png>)
 
